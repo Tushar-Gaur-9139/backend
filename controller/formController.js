@@ -13,11 +13,11 @@ const upload = multer({
         },
     }),
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const allowedTypes = ['application/pdf',  'application/doc', 'application/docx'];
         if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Only .pdf, .jpeg, and .png files are allowed.'));
+            cb(new Error('.jpeg, and .png files are allowed.'));
         }
     },
     limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -41,10 +41,10 @@ const formController = async (req, res) => {
     if (!name || name.length < 10) {
         return res.status(400).json({ success: false, message: 'Invalid name.' });
     }
-    if (!companyName || companyName.length < 10) {
+    if (!companyName || " ") {
         return res.status(400).json({ success: false, message: 'Invalid company name.' });
     }
-    if (!message || message.length < 10) {
+    if (!message || message.length < 50) {
         return res.status(400).json({ success: false, message: 'Invalid message.' });
     }
 

@@ -14,11 +14,17 @@ app.use(cors());
 app.use(bodyParser.json()); // Parse JSON bodies (as sent by API clients)
 
 const emailRoutes = require("./routes/routes");
-const formRoutes = require("./routes/formRoutes"); // Import the form routes
-app.use("/api", emailRoutes);
-app.use("/api", formRoutes); // Use the form routes under the /api path
- // Use the email routes under the /api path
+const formRoutes = require("./routes/formRoutes"); 
+const contactRoutes=require('./routes/contactRoutes ')
+// const contactController = require("./controller/contactController");
 
+
+// Import the form routes
+app.use("/api", emailRoutes);
+app.use("/api", formRoutes); 
+app.use("/api", contactRoutes)
+
+// app.use("/api", contactController); 
 app.get('/', (req, res) => {
     res.send("server running perfectly");
 });
