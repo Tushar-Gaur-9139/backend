@@ -12,7 +12,7 @@ console.log(req.body);
         // Send the email using nodemailer
         const info = await transporter.sendMail({
             from: `"Satvik-Tech" <${process.env.EMAIL_USER}>`, // Sender address
-            to: userEmail, // Recipient's email address
+            to: `"Satvik-Tech" <${process.env.EMAIL_USER}>`, // Recipient's email address
             subject: subject, // Subject line
             text: `${text} - ${userEmail}`, // Plain text body
         });

@@ -6,55 +6,60 @@ const multer = require('multer');
 const upload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, 'uploads/'); // Specify the uploads folder
+            cb(null, 'uploads/'); // Folder to save uploaded files
         },
         filename: (req, file, cb) => {
-            cb(null, `${Date.now()}-${file.originalname}`); // Rename the file with a timestamp
+            cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
         },
     }),
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['application/pdf',  'application/doc', 'application/docx'];
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword', // .doc
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        ];
+
         if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('.jpeg, and .png files are allowed.'));
+            cb(new Error('Only PDF, DOC, and DOCX files are allowed.'));
         }
     },
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
 // Controller to handle form submission
 const formController = async (req, res) => {
     const { name, email, phone, companyName, message } = req.body;
-    const attachment = req.file; // Access the uploaded file
+    const attachment = req.file;
 
     console.log(req.body);
     console.log('Uploaded file:', attachment);
 
-    // Validate inputs
+    // Input validation
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
         return res.status(400).json({ success: false, message: 'Invalid email address.' });
     }
     if (!phone || phone.length < 10) {
         return res.status(400).json({ success: false, message: 'Invalid phone number.' });
     }
-    if (!name || name.length < 10) {
-        return res.status(400).json({ success: false, message: 'Invalid name.' });
+    if (!name || name.length < 3) {
+        return res.status(400).json({ success: false, message: 'Name must be at least 3 characters.' });
     }
-    if (!companyName || " ") {
+    if (!companyName || companyName.trim() === '') {
         return res.status(400).json({ success: false, message: 'Invalid company name.' });
     }
     if (!message || message.length < 50) {
-        return res.status(400).json({ success: false, message: 'Invalid message.' });
+        return res.status(400).json({ success: false, message: 'Message must be at least 50 characters.' });
     }
 
     try {
-        // Send the email using nodemailer
+        // Set up email content
         const mailOptions = {
-            from: `"Satvik-Tech" <${process.env.EMAIL_USER}>`, // Sender address
-            to: email, // Recipient's email address
-            subject: `Message from ${name}`, // Subject line
-            text: `${message} - ${email} - ${name} - ${companyName} - ${phone}`, // Plain text body
+            from: `"Satvik-Tech" <${process.env.EMAIL_USER}>`,
+            to: `"Satvik-Tech" <${process.env.EMAIL_USER}>`,
+            subject: `Message from ${name}`,
+            text: `${message}\n\nDetails:\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nCompany: ${companyName}`,
             attachments: attachment
                 ? [
                       {
@@ -65,9 +70,10 @@ const formController = async (req, res) => {
                 : [],
         };
 
+        // Send email
         const info = await transporter.sendMail(mailOptions);
-
         console.log('Message sent: %s', info.messageId);
+
         res.status(200).json({ success: true, message: 'Email sent successfully.' });
     } catch (error) {
         console.error('Error sending email:', error);
