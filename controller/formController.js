@@ -57,7 +57,7 @@ const formController = async (req, res) => {
         // Set up email content
         const mailOptions = {
             from: `"Satvik-Tech" <${process.env.EMAIL_USER}>`,
-            to: `"Satvik-Tech" <${process.env.EMAIL_USER}>`,
+            to:  process.env.EMAIL_USER,
             subject: `Message from ${name}`,
             text: `${message}\n\nDetails:\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nCompany: ${companyName}`,
             attachments: attachment

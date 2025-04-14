@@ -25,7 +25,7 @@ const contactController = async (req, res) => {
         // Send the email using nodemailer
         const info = await transporter.sendMail({
             from: `"Satvik-Tech" <${process.env.EMAIL_USER}>`, // Sender address
-            to: `"Satvik-Tech" <${process.env.EMAIL_USER}>`, // Recipient's email address
+            to:  process.env.EMAIL_USER, // Recipient's email address
             subject: `Message from ${name}`, // Subject line
             text: `${message} - ${email} - ${name} - ${companyName} - ${phone}` // Plain text body
         });
